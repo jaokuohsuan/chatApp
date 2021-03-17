@@ -70,7 +70,7 @@ const BoardBlock = () => {
             displayName={each.displayName}
             key={each.timestamp}
             isOwner={userId === each.userId}
-            isLast={index < messages.length - 1}
+            isLast={index >= messages.length - 1}
           />
         );
       })}
