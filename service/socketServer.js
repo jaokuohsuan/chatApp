@@ -60,6 +60,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateDisplayName", (payload) => {
-    sessionStore.set(payload.userId, payload.displayName);
+    sessionStore.set(payload.userId, {
+      userId: payload.userId,
+      displayName: payload.displayName,
+    });
   })
 });
