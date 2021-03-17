@@ -29,6 +29,9 @@ export const messagesSlice = createSlice({
     newMessage: (state, action) => {
       state.messageList = [...state.messageList, action.payload];
     },
+    recoverMessages: (state, action) => {
+      state.messageList = action.payload;
+    },
     // extraReducers: {
     //   // Add reducers for additional action types here, and handle loading state as needed
     //   [summitMessage.fulfilled]: (state, action) => {
@@ -39,6 +42,10 @@ export const messagesSlice = createSlice({
   },
 });
 
-export const { summitMessage, newMessage } = messagesSlice.actions;
+export const {
+  summitMessage,
+  newMessage,
+  recoverMessages,
+} = messagesSlice.actions;
 
 export default messagesSlice.reducer;

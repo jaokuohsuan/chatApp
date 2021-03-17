@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket";
 import { leaveSetupPage, gotoSetupPage } from "./store/pageSlice";
 import { updateUserId } from "./store/userSettingSlice";
-import { newMessage } from "./store/messagesSlice";
+import { newMessage, recoverMessages } from "./store/messagesSlice";
 import InputBlock from "./InputBlock";
 import BoardBlock from "./BoardBlock";
 import Login from "./Login";
@@ -24,9 +24,11 @@ const App = () => {
   };
 
   const connectWebSocket = () => {
-    if (getUserIdSession()) {
-      socket.auth = { userId: getUserIdSession() };
+    const userId = getUserIdSession();
+    if (userId) {
+      socket.auth = { userId: userId };
       socket.connect("http://localhost:4040");
+      socket.emit("getSessionMessages", { userId });
       dispatch(leaveSetupPage());
     } else {
       dispatch(gotoSetupPage());
@@ -47,6 +49,10 @@ const App = () => {
 
     socket.on("newMessage", (aMessageObj) => {
       dispatch(newMessage(aMessageObj));
+    });
+
+    socket.on("receiveSessionMessages", (messages) => {
+      dispatch(recoverMessages(messages));
     });
   };
 
