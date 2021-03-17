@@ -1,5 +1,7 @@
-import "./App.css";
-import React, { useState, useEffect } from "react";
+/** @jsxImportSource @emotion/react */
+
+import React, { useEffect } from "react";
+import { css } from "@emotion/react";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket";
 import { leaveSetupPage, gotoSetupPage } from "./store/pageSlice";
@@ -12,7 +14,6 @@ import Login from "./Login";
 const App = () => {
   const isSetupPage = useSelector((state) => state.page.isSetupPage);
   const dispatch = useDispatch();
-  const [ws, setWs] = useState(null);
 
   const getUserIdSession = () => {
     const userId = sessionStorage.getItem("userId");
@@ -39,17 +40,15 @@ const App = () => {
     socket.on("session", ({ userId, displayName }) => {
       dispatch(leaveSetupPage());
 
-
       if (userId) {
         sessionStorage.setItem("userId", userId);
         socket.auth = { userId };
         dispatch(updateUserId(userId));
-
       }
 
-      console.log('App seesion displayName', displayName)
+      console.log("App seesion displayName", displayName);
 
-      if(displayName) {
+      if (displayName) {
         dispatch(updateDisplayName(displayName));
       }
     });
@@ -80,8 +79,21 @@ const App = () => {
       );
     }
   };
+  const styled = css`
+    text-align: center;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    padding: 1rem;
+    box-sizing: border-box;
+    align-items: stretch;
+  `;
 
-  return <div className="App">{pageRender()}</div>;
+  return <div className="App" css={styled}>{pageRender()}</div>;
 };
 
 export default App;
