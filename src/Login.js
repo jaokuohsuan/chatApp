@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket";
 import { updateDisplayName } from "./store/userSettingSlice";
+import { leaveSetupPage } from "./store/pageSlice";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 
@@ -54,6 +55,7 @@ const Login = () => {
   const defaultDisplayName = useSelector(
     (state) => state.userSetting.displayName
   );
+  const userId = useSelector((state) => state.userSetting.userId);
   const [userName, setUserName] = useState(defaultDisplayName);
 
   const onChange = (event) => {
@@ -64,13 +66,23 @@ const Login = () => {
     if (!userName) {
       return;
     }
-    socket.auth = { displayName: userName };
-    socket.connect("http://localhost:4040");
+    if (!socket.connected) {
+      socket.auth = { displayName: userName };
+      socket.connect("http://localhost:4040");
+    } else {
+      socket.emit("updateDisplayName", {
+        userId: userId,
+        displayName: userName,
+      });
+      dispatch(leaveSetupPage());
+    }
+
     dispatch(updateDisplayName(userName));
   };
 
   const handleClick = (event) => {
-
+    event.preventDefault();
+    handleSummit();
   };
 
   const handleKeyPress = (event) => {
@@ -94,7 +106,9 @@ const Login = () => {
         onChange={onChange}
         onKeyPress={handleKeyPress}
       />
-      <SummitButton css={activeStyleButton} onClick={handleClick}> enter </SummitButton>
+      <SummitButton css={activeStyleButton} onClick={handleClick}>
+        enter
+      </SummitButton>
     </div>
   );
 };

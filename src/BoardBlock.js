@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
@@ -13,19 +13,25 @@ const MessageItem = ({ displayName, message, isOwner, isLast }) => {
     margin: 0.5rem 0;
   `;
 
+  const nameBasicWith = "5rem";
+
   const ConversationBlock = styled.div`
-    background: #fff;
     border-radius: 0.25rem;
     color: #333;
     padding: 1rem;
     text-align: ${isOwner ? "right" : "left"};
+    background: ${isOwner ? "#7fc1f5" : "#fff"};
+    max-width: calc(100% - ${nameBasicWith});
   `;
 
   const UserName = styled.div`
+    display:  ${isOwner ? "none" : "block"};
+    flex-basis: ${nameBasicWith});
     font-size: 0.8rem;
     flex-grow: 0;
     flex-shrink: 0;
     margin: 0 0.5rem;
+
   `;
 
   const messageEl = useRef(null);

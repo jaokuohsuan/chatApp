@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket";
 import { leaveSetupPage, gotoSetupPage } from "./store/pageSlice";
-import { updateUserId } from "./store/userSettingSlice";
+import { updateUserId, updateDisplayName } from "./store/userSettingSlice";
 import { newMessage, recoverMessages } from "./store/messagesSlice";
 import InputBlock from "./InputBlock";
 import BoardBlock from "./BoardBlock";
@@ -39,12 +39,19 @@ const App = () => {
     socket.on("session", ({ userId, displayName }) => {
       dispatch(leaveSetupPage());
 
+
       if (userId) {
         sessionStorage.setItem("userId", userId);
         socket.auth = { userId };
         dispatch(updateUserId(userId));
+
       }
-      socket.displayName = displayName;
+
+      console.log('App seesion displayName', displayName)
+
+      if(displayName) {
+        dispatch(updateDisplayName(displayName));
+      }
     });
 
     socket.on("newMessage", (aMessageObj) => {

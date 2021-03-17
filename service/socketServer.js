@@ -48,9 +48,9 @@ io.on("connection", (socket) => {
     io.emit("newMessage", messageObj);
   });
 
-  socket.on("getSessionMessages", (Obj) => {
+  socket.on("getSessionMessages", (payload) => {
     const sessionIndex = messageStore.findIndex(
-      (aMessage) => aMessage.userId === Obj.userId
+      (aMessage) => aMessage.userId === payload.userId
     );
     const sessionMessages = messageStore.slice(sessionIndex);
 
@@ -58,4 +58,8 @@ io.on("connection", (socket) => {
       socket.emit("receiveSessionMessages", sessionMessages);
     }
   });
+
+  socket.on("updateDisplayName", (payload) => {
+    sessionStore.set(payload.userId, payload.displayName);
+  })
 });

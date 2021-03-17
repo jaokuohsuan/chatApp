@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket";
+import { gotoSetupPage } from "./store/pageSlice";
 
 const wrapperStyle = css`
   display: flex;
@@ -40,9 +41,25 @@ const SummitButton = styled.button`
   outline: none;
 `;
 
+const SettingButton = styled.button`
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #212529;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: none;
+  outline: none;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+`;
+
 const InputBlock = () => {
   const [message, setMessage] = useState("");
   const userId = useSelector((state) => state.userSetting.userId);
+  const displayName = useSelector((state) => state.userSetting.displayName);
+  const dispatch = useDispatch();
 
   const onChange = (event) => {
     setMessage(event.target.value);
@@ -55,7 +72,7 @@ const InputBlock = () => {
     socket.emit("summitMessage", {
       userId: userId,
       message: message,
-      displayName: socket.displayName,
+      displayName: displayName,
       timestamp: Date.now(),
     });
     setMessage("");
@@ -72,6 +89,11 @@ const InputBlock = () => {
     }
   };
 
+  const handleSettingClick = (event) => {
+    event.preventDefault();
+    dispatch(gotoSetupPage());
+  };
+
   const activeStyleButton = css`
     background-color: ${message ? "#0d6efd" : "#ccc"};
     color: ${message ? "#fff" : "#666"};
@@ -79,6 +101,7 @@ const InputBlock = () => {
 
   return (
     <div css={wrapperStyle}>
+      <SettingButton onClick={handleSettingClick}>=</SettingButton>
       <MessageInput
         value={message}
         onChange={onChange}
