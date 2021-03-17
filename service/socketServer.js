@@ -48,12 +48,14 @@ io.on("connection", (socket) => {
     io.emit("newMessage", messageObj);
   });
 
-  socket.on("getSessionMessages",(Obj) => {
-    const sessionIndex = messageStore.findIndex((aMessage) => aMessage.userId === Obj.userId)
+  socket.on("getSessionMessages", (Obj) => {
+    const sessionIndex = messageStore.findIndex(
+      (aMessage) => aMessage.userId === Obj.userId
+    );
     const sessionMessages = messageStore.slice(sessionIndex);
 
     if (sessionMessages) {
-      socket.emit('receiveSessionMessages', sessionMessages)
+      socket.emit("receiveSessionMessages", sessionMessages);
     }
   });
 });
