@@ -33,12 +33,6 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log(
-    "success connect!",
-    socket.userId,
-    socket.displayName,
-    socket.handshake.auth.userId
-  );
   sessionStore.set(socket.userId, {
     userId: socket.userId,
     displayName: socket.displayName,
@@ -49,7 +43,7 @@ io.on("connection", (socket) => {
     displayName: socket.displayName,
   });
 
-  socket.on("getMessage", (messageObj) => {
+  socket.on("summitMessage", (messageObj) => {
     messageStore.push(messageObj);
     io.emit("newMessage", messageObj);
   });

@@ -1,9 +1,18 @@
 /** @jsxImportSource @emotion/react */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import socket from "./socket";
+import { updateDisplayName } from "./store/userSettingSlice";
 import styled from "@emotion/styled";
-import {css} from "@emotion/react";
+import { css } from "@emotion/react";
 
+const UserLabel = styled.label`
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+`;
 
 const UserNameInput = styled.input`
   padding: 0.375rem 0.75rem;
@@ -16,7 +25,7 @@ const UserNameInput = styled.input`
   border: none;
   appearance: none;
   border-radius: 0.25rem 0 0 0.25rem;
-  flex-grow: 1;
+  outline: none;
 `;
 
 const SummitButton = styled.button`
@@ -29,28 +38,65 @@ const SummitButton = styled.button`
   vertical-align: middle;
   border: none;
   border-radius: 0 0.25rem 0.25rem 0;
+  outline: none;
 `;
 
 const wrapperStyle = css`
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 2rem);
 `;
 
 const Login = () => {
-
-  const [userName, setUserName] = useState("");
+  const dispatch = useDispatch();
+  const defaultDisplayName = useSelector(
+    (state) => state.userSetting.displayName
+  );
+  const [userName, setUserName] = useState(defaultDisplayName);
 
   const onChange = (event) => {
     setUserName(event.target.value);
   };
 
-return (
-  <div css={wrapperStyle}>
-    <UserNameInput value={userName} onChange={onChange} />
-    <SummitButton> > </SummitButton>
-  </div>
-)
+  const handleSummit = () => {
+    if (!userName) {
+      return;
+    }
+    socket.auth = { displayName: userName };
+    socket.connect("http://localhost:4040");
+    dispatch(updateDisplayName(userName));
+  };
 
-}
+  const handleClick = (event) => {
+
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSummit();
+    }
+  };
+
+  const activeStyleButton = css`
+    background-color: ${userName ? "#0d6efd" : "#ccc"};
+    color: ${userName ? "#fff" : "#666"};
+  `;
+
+  return (
+    <div css={wrapperStyle}>
+      <UserLabel htmlFor="userName">Display Name:</UserLabel>
+      <UserNameInput
+        id="userName"
+        maxLength={20}
+        value={userName}
+        onChange={onChange}
+        onKeyPress={handleKeyPress}
+      />
+      <SummitButton css={activeStyleButton} onClick={handleClick}> enter </SummitButton>
+    </div>
+  );
+};
 
 export default Login;

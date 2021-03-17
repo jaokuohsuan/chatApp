@@ -1,43 +1,37 @@
 /** @jsxImportSource @emotion/react */
 
 import React, { useState } from "react";
-import {css } from "@emotion/react";
+import {css} from "@emotion/react";
 import styled from "@emotion/styled";
+import { useSelector} from "react-redux";
 
-
-const MessageItem = () => {
+const MessageItem = ({displayName, message, owner}) => {
   const itemStyle = css`
     font-size: 0.8rem;
     display: flex;
-    flex-direction: row;
+    flex-direction: ${owner ? 'row-reverse': 'row'};
     margin: .5rem 0;
   `;
 
-  const CoversationBlock = styled.div`
+  const ConversationBlock = styled.div`
     background: #fff;
     border-radius: 0.25rem;
     color: #333;
     padding: 1rem;
+    text-align:  ${owner ? 'right': 'left'};
   `;
 
   const UserName = styled.div`
     font-size: 0.8rem;
     flex-grow: 0;
     flex-shrink: 0;
-    margin-right: 0.5rem;
+    margin: 0 0.5rem;
   `;
-
-  const [messageObj] = useState({
-    message: "lalalalal",
-    userId: "123",
-    displayName: "funny",
-    timestamp: "1234656",
-  });
 
   return (
     <div className="MessageItem" css={itemStyle}>
-      <UserName>{messageObj.displayName}</UserName>
-      <CoversationBlock>{messageObj.message}</CoversationBlock>
+      <UserName>{displayName}</UserName>
+      <ConversationBlock>{message}</ConversationBlock>
     </div>
   );
 };
@@ -48,10 +42,17 @@ const BoardBlock = () => {
     overflow: scroll;
   `;
 
+  const messages = useSelector((state) => state.messages.messageList);
+  const userId = useSelector((state) => state.userSetting.userId);
+
+
   return (
     <div className="BoardBlock" css={wrapperStyle}>
-      <MessageItem />
-      <MessageItem />
+      {messages.map((each) => {
+        return (
+          <MessageItem message={each.message} displayName={each.displayName} key={each.timestamp} owner={userId === each.userId} />
+        );
+      })}
     </div>
   );
 };

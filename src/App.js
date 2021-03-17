@@ -1,11 +1,17 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket";
+import { leaveSetupPage, gotoSetupPage } from "./store/pageSlice";
+import { updateUserId } from "./store/userSettingSlice";
+import { newMessage } from "./store/messagesSlice";
 import InputBlock from "./InputBlock";
 import BoardBlock from "./BoardBlock";
 import Login from "./Login";
 
 const App = () => {
+  const isSetupPage = useSelector((state) => state.page.isSetupPage);
+  const dispatch = useDispatch();
   const [ws, setWs] = useState(null);
 
   const getUserIdSession = () => {
@@ -18,49 +24,51 @@ const App = () => {
   };
 
   const connectWebSocket = () => {
-    if (getUserIdSession) {
+    if (getUserIdSession()) {
       socket.auth = { userId: getUserIdSession() };
+      socket.connect("http://localhost:4040");
+      dispatch(leaveSetupPage());
+    } else {
+      dispatch(gotoSetupPage());
     }
-
-    socket.connect("http://localhost:4040");
   };
 
   const initWebSocket = () => {
-    console.log("init ws");
-
     socket.on("session", ({ userId, displayName }) => {
-      // store it in the sessionStorage
+      dispatch(leaveSetupPage());
+
       if (userId) {
         sessionStorage.setItem("userId", userId);
         socket.auth = { userId };
+        dispatch(updateUserId(userId));
       }
       socket.displayName = displayName;
     });
 
-    socket.on("getMessage", (message) => {
-      console.log(message);
+    socket.on("newMessage", (aMessageObj) => {
+      dispatch(newMessage(aMessageObj));
     });
   };
 
-  const sendMessage = () => {
-    socket.emit("getMessage", "只回傳給發送訊息的 client");
-  };
-
   useEffect(() => {
-    // if (ws) {
-    //
-    // } else {
     connectWebSocket();
-    // }
     initWebSocket();
   }, []);
 
-  return (
-    <div className="App">
-      <BoardBlock />
-      <InputBlock />
-    </div>
-  );
+  const pageRender = () => {
+    if (isSetupPage) {
+      return <Login />;
+    } else {
+      return (
+        <>
+          <BoardBlock />
+          <InputBlock />
+        </>
+      );
+    }
+  };
+
+  return <div className="App">{pageRender()}</div>;
 };
 
 export default App;

@@ -1,10 +1,10 @@
 /** @jsxImportSource @emotion/react */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
-
-
+import { useSelector } from "react-redux";
+import socket from "./socket";
 
 const wrapperStyle = css`
   display: flex;
@@ -24,6 +24,7 @@ const MessageInput = styled.input`
   appearance: none;
   border-radius: 0.25rem 0 0 0.25rem;
   flex-grow: 1;
+  outline: none;
 `;
 
 const SummitButton = styled.button`
@@ -36,19 +37,56 @@ const SummitButton = styled.button`
   vertical-align: middle;
   border: none;
   border-radius: 0 0.25rem 0.25rem 0;
+  outline: none;
 `;
 
 const InputBlock = () => {
   const [message, setMessage] = useState("");
+  const userId = useSelector((state) => state.userSetting.userId);
 
   const onChange = (event) => {
     setMessage(event.target.value);
   };
 
+  const handleSummit = () => {
+    if (!message) {
+      return;
+    }
+    socket.emit("summitMessage", {
+      userId: userId,
+      message: message,
+      displayName: socket.displayName,
+      timestamp: Date.now(),
+    });
+    setMessage("");
+  };
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    handleSummit();
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSummit();
+    }
+  };
+
+  const activeStyleButton = css`
+    background-color: ${message ? "#0d6efd" : "#ccc"};
+    color: ${message ? "#fff" : "#666"};
+  `;
+
   return (
     <div css={wrapperStyle}>
-      <MessageInput value={message} onChange={onChange} />
-      <SummitButton> > </SummitButton>
+      <MessageInput
+        value={message}
+        onChange={onChange}
+        onKeyPress={handleKeyPress}
+      />
+      <SummitButton css={activeStyleButton} onClick={handleClick}>
+        >
+      </SummitButton>
     </div>
   );
 };
